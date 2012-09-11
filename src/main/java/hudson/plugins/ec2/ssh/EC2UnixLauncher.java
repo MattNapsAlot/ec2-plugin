@@ -127,7 +127,12 @@ public class EC2UnixLauncher extends EC2ComputerLauncher {
                     "slave.jar","/tmp");
 
             String jvmopts = computer.getNode().jvmopts;
-            String launchString = "java " + (jvmopts != null ? jvmopts : "") + " -jar /tmp/slave.jar";
+            String launchString = null;
+            if(conn.exec("if which -s cygpath; then echo 1; else echo 0; fi") == 1){
+                launchString = "java " + (jvmopts != null ? jvmopts : "") + " -jar ""$(cygpath -m /tmp/slave.jar)""";
+            } else {
+                launchString = "java " + (jvmopts != null ? jvmopts : "") + " -jar /tmp/slave.jar";
+            }
             logger.println("Launching slave agent: " + launchString);
             final Session sess = conn.openSession();
             sess.execCommand(launchString);
