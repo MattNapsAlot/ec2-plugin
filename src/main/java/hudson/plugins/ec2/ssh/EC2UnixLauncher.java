@@ -128,8 +128,10 @@ public class EC2UnixLauncher extends EC2ComputerLauncher {
 
             String jvmopts = computer.getNode().jvmopts;
             String launchString = null;
-            if(conn.exec("if which -s cygpath; then echo 1; else echo 0; fi") == 1){
-                launchString = "java " + (jvmopts != null ? jvmopts : "") + " -jar ""$(cygpath -m /tmp/slave.jar)""";
+
+            //make things work for cygwin windows
+            if(conn.exec( "if which -s cygpath; then echo 1; else echo 0; fi", logger) == 1){
+                launchString = "java " + (jvmopts != null ? jvmopts : "") + " -jar \"$(cygpath -m /tmp/slave.jar)\"";
             } else {
                 launchString = "java " + (jvmopts != null ? jvmopts : "") + " -jar /tmp/slave.jar";
             }
